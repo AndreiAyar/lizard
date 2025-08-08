@@ -2,9 +2,16 @@ from fastapi import FastAPI
 from pynput import keyboard
 import simpleaudio as sa
 
+
+sound_to_play_on_k_press = sa.WaveObject.from_wave_file("path/to/file.wav")
+
+
 def on_press(key):
     print("key pressed {0}".format(key))
- 
+
+
+play_obj = sound_to_play_on_k_press.play()
+# play_obj.wait_done() blocking not needed as for now..
 
 
 listener = keyboard.Listener(on_press=on_press)
