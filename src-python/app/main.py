@@ -3,6 +3,7 @@ from pynput import keyboard
 import simpleaudio as sa
 import os
 import time
+import json
 
 main_dir = os.path.dirname(os.path.abspath(__file__))
 sound_path = os.path.join(main_dir, "sounds", "lizard_cleaned.wav")
@@ -30,6 +31,14 @@ def on_press(key):
 
 listener = keyboard.Listener(on_press=on_press)
 listener.start()
+
+
+def load_settings():
+    if os.path.isfile(settings_file):
+        with open(settings_file, "r") as f:
+            return json.load(f)
+    else:
+        return {"debounce_delay", 0.3}
 
 
 app = FastAPI()
