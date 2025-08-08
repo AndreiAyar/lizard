@@ -75,3 +75,4 @@ def update_settings(new_settings: dict):
         settings_data["debounce_delay"] = debounce
         save_settings(settings_data)
         DEBOUNCE_DELAY = debounce
+    return {"message": "Settings updated"}
