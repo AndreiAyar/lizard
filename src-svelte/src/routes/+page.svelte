@@ -52,15 +52,81 @@
 	}
 </script>
 
-<h1>Welcome to SvelteKit</h1>
-Lizards per second: {debounceValue}
-<input
-	type="range"
-	step={0.1}
-	min={0}
-	max="5"
-	bind:value={debounceValue}
-	onchange={onSliderChange}
-	class="range"
-/>
-<p>Visit <a href="https://svelte.dev/docs/kit">svelte.dev/docs/kit</a> to read the documentation</p>
+
+<div class="min-h-screen bg-white flex items-center justify-center p-8">
+    <div class="w-full max-w-md space-y-8">
+        <!-- Header -->
+        <div class="text-center">
+            <h1 class="text-6xl font-light text-gray-900 mb-2">🦎</h1>
+            <h2 class="text-3xl font-light text-gray-800 mb-1">LIZARD</h2>
+            <p class="text-gray-500 text-sm">Keypress sound settings</p>
+        </div>
+
+        <!-- Settings Card -->
+        <div class="bg-gray-50 rounded-2xl p-8 shadow-sm border border-gray-100">
+            <div class="space-y-6">
+                <!-- Current Value Display -->
+                <div class="text-center">
+                    <div class="text-4xl font-light text-gray-900 mb-1">
+                        {debounceValue.toFixed(1)}s
+                    </div>
+                    <div class="text-sm text-gray-500">Delay between sounds</div>
+                </div>
+
+                <!-- Slider -->
+                <div class="space-y-4">
+                    <input
+                        type="range"
+                        step={0.1}
+                        min={0.1}
+                        max="5"
+                        bind:value={debounceValue}
+                        on:input={onSliderChange}
+                        class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
+                    />
+                    
+                    <!-- Range Labels -->
+                    <div class="flex justify-between text-xs text-gray-400">
+                        <span>0.1s</span>
+                        <span>Fast</span>
+                        <span>Slow</span>
+                        <span>5.0s</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="text-center">
+            <p class="text-xs text-gray-400">Press any key to hear LIZARD 🦎</p>
+        </div>
+    </div>
+</div>
+
+<style>
+    .slider::-webkit-slider-thumb {
+        appearance: none;
+        height: 20px;
+        width: 20px;
+        border-radius: 50%;
+        background: #374151;
+        cursor: pointer;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        transition: all 0.2s ease;
+    }
+
+    .slider::-webkit-slider-thumb:hover {
+        background: #111827;
+        transform: scale(1.1);
+    }
+
+    .slider::-moz-range-thumb {
+        height: 20px;
+        width: 20px;
+        border-radius: 50%;
+        background: #374151;
+        cursor: pointer;
+        border: none;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+</style>
