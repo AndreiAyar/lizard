@@ -25,27 +25,29 @@
 		}
 	}
 
-    async function updateSettings() {
-        try {
-            const request = await fetch('http://localhost:8000/settings', {
-                method:"POST",
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ debounce_delay: debounceValue })
-            });
+	async function updateSettings(value: number) {
+		try {
+			if (value > 0) {
+				const request = await fetch('http://localhost:8000/settings', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify({ debounce_delay: debounceValue })
+				});
 
-        
-        
-        }catch(error){
-            console.error("There was an error on updating", error)
-        }
-        
-        
-    }
+                if(request.status === 200){
+                    ///Todo
+                }
+			}
+		} catch (error) {
+			console.error('There was an error on updating', error);
+		}
+	}
 
 	function onSliderChange(event: Event) {
 		const value = (event.target as HTMLSelectElement).value;
+		updateSettings(+value);
 		console.log('val changed', value);
 	}
 </script>
