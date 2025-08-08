@@ -8,8 +8,7 @@ script_dir = os.path.dirname(os.path.abspath(__file__))
 sound_path = os.path.join(script_dir, "sounds", "lizard_cleaned.wav")
 sound_to_play_on_k_press = sa.WaveObject.from_wave_file(sound_path)
 last_played = 0
-DEBOUNCE_DELAY = 0.3  # seconds
-
+DEBOUNCE_DELAY = 0  # seconds
  
 
 def on_press(key):
