@@ -20,7 +20,7 @@
 			return { debounce_delay: 0.3 }; // Default value
 		}
 	}
-
+    console.log('dd', settings.debounce_delay)
 	let debounceValue: number = $state(settings.debounce_delay);
 	function onSliderChange(event: Event) {
 		const value = (event.target as HTMLSelectElement).value;
