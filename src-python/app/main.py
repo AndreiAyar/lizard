@@ -1,9 +1,11 @@
 from fastapi import FastAPI
 from pynput import keyboard
 import simpleaudio as sa
+import os
 
-
-sound_to_play_on_k_press = sa.WaveObject.from_wave_file("./sounds/lizard.mp3")
+script_dir = os.path.dirname(os.path.abspath(__file__))
+sound_path = os.path.join(script_dir, "sounds", "lizard.wav")
+sound_to_play_on_k_press = sa.WaveObject.from_wave_file(sound_path)
 
 
 def on_press(key):
