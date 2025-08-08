@@ -1,8 +1,11 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	let settings: { debounce_delay: number } = { debounce_delay: 0.3 };
+	const default_delay = 0.3;
+	let settings: Record<string, number | string>;
+	let debounceValue: number = $state(default_delay);
 	onMount(async () => {
 		settings = await getSettings();
+		debounceValue = settings?.debounce_delay as number;
 	});
 
 	async function getSettings() {
@@ -14,15 +17,14 @@
 				throw new Error('Network response was not ok');
 			}
 			const data = await response.json();
-            console.log('data este',data)
+			console.log('data este', data);
 			return data;
 		} catch (error) {
 			console.error('Failed to fetch settings:', error);
 			return { debounce_delay: 0.69 }; // Default value
 		}
 	}
-    console.log('dd', settings.debounce_delay)
-	let debounceValue: number = $state(settings.debounce_delay);
+
 	function onSliderChange(event: Event) {
 		const value = (event.target as HTMLSelectElement).value;
 		console.log('val changed', value);
@@ -31,5 +33,13 @@
 
 <h1>Welcome to SvelteKit</h1>
 
-<input type="range" step={0.1} min={0.1} max="5" value={debounceValue} onchange={onSliderChange} class="range" />
+<input
+	type="range"
+	step={0.1}
+	min={0.1}
+	max="5"
+	value={debounceValue}
+	onchange={onSliderChange}
+	class="range"
+/>
 <p>Visit <a href="https://svelte.dev/docs/kit">svelte.dev/docs/kit</a> to read the documentation</p>
