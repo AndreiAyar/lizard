@@ -38,6 +38,7 @@
 
 				if (request.status === 200) {
 					///Todo
+                    debounceValue = default_delay
 				}
 			}
 		} catch (error) {
@@ -90,8 +91,10 @@
 					<div class="flex justify-between text-xs text-gray-400">
 						<button
 							type="button"
-							class="font-medium text-green-500 bg-transparent border-none p-0 m-0 cursor-pointer"
-							onclick={() => debounceValue = default_delay}
+							class="m-0 cursor-pointer border-none bg-transparent p-0 font-medium text-green-500"
+							onclick={() => {
+								updateSettings(default_delay);
+							}}
 						>
 							Very Fast
 						</button>
