@@ -14,10 +14,11 @@
 				throw new Error('Network response was not ok');
 			}
 			const data = await response.json();
+            console.log('data este',data)
 			return data;
 		} catch (error) {
 			console.error('Failed to fetch settings:', error);
-			return { debounce_delay: 0.3 }; // Default value
+			return { debounce_delay: 0.69 }; // Default value
 		}
 	}
     console.log('dd', settings.debounce_delay)
