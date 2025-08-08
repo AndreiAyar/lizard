@@ -4,6 +4,8 @@ import simpleaudio as sa
 import os
 import time
 import json
+from fastapi.middleware.cors import CORSMiddleware
+
 
 main_dir = os.path.dirname(os.path.abspath(__file__))
 sound_path = os.path.join(main_dir, "sounds", "lizard_cleaned.wav")
@@ -14,7 +16,6 @@ sound_to_play_on_k_press = sa.WaveObject.from_wave_file(sound_path)
 last_played = 0
 
 
-
 def on_press(key):
     print("key pressed {0}".format(key))
 
@@ -22,8 +23,8 @@ def on_press(key):
     now = time.time()
     if now - last_played > DEBOUNCE_DELAY:
         if sound_to_play_on_k_press:
-           # return
-           sound_to_play_on_k_press.play()
+            # return
+            sound_to_play_on_k_press.play()
         last_played = now
 
 
@@ -46,6 +47,7 @@ def save_settings(settings):
     with open(settings_file, "w") as f:
         json.dump(settings, f)
 
+
 def update_settings(new_settings: dict):
     global settings_data, DEBOUNCE_DELAY
     if new_settings is None or not isinstance(new_settings, dict):
@@ -64,11 +66,23 @@ def update_settings(new_settings: dict):
     return {"message": "Settings updated"}
 
 
-
 settings_data = load_settings()
 DEBOUNCE_DELAY = settings_data.get("debounce_delay", 0.1)
 
 app = FastAPI()
+
+origins = [
+    "http://localhost",
+    "http://localhost:8080",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.get("/")
@@ -79,6 +93,7 @@ def read_root():
 @app.get("/settings")
 def get_settings():
     return settings_data
+
 
 @app.post("/settings")
 def post_settings(new_settings: dict):
