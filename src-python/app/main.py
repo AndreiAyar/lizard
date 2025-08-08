@@ -47,6 +47,8 @@ def save_settings(settings):
 
 def update_settings(new_settings: dict):
     global settings_data, DEBOUNCE_DELAY
+    if new_settings is None or not isinstance(new_settings, dict):
+        return {"error": "No settings provided."}
     debounce = new_settings.get("debounce_delay")
     if debounce is not None:
         try:
