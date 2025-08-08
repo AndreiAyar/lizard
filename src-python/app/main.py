@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from pynput import keyvoard
+from pynput import keyboard
 
 app = FastAPI()
 
