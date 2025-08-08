@@ -81,7 +81,7 @@
                         min={0.1}
                         max="5"
                         bind:value={debounceValue}
-                        on:input={onSliderChange}
+                        oninput={onSliderChange}
                         class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
                     />
                     
