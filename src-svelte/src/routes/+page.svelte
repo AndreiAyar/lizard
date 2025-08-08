@@ -1,4 +1,27 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
+	let settings: { debounce_delay: number } = { debounce_delay: 0.3 };
+	onMount(async () => {
+		settings = await getSettings();
+	});
+
+	async function getSettings() {
+		try {
+			const response = await fetch('localhost:8000/settings', {
+				method: 'GET'
+			});
+			if (!response.ok) {
+				throw new Error('Network response was not ok');
+			}
+			const data = await response.json();
+			return data;
+		} catch (error) {
+			console.error('Failed to fetch settings:', error);
+			return { debounce_delay: 0.3 }; // Default value
+		}
+	}
+
+	let debounceValue: number = $state(settings.debounce_delay);
 	function onSliderChange(event: Event) {
 		const value = (event.target as HTMLSelectElement).value;
 		console.log('val changed', value);
