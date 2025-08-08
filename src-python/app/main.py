@@ -12,7 +12,7 @@ settings_file =  os.path.join(main_dir, "data", "settings.json")
 sound_to_play_on_k_press = sa.WaveObject.from_wave_file(sound_path)
 
 last_played = 0
-DEBOUNCE_DELAY = 0.3  # seconds
+
  
 
 def on_press(key):
@@ -40,6 +40,8 @@ def load_settings():
     else:
         return {"debounce_delay", 0.3}
 
+settings_data = load_settings()
+DEBOUNCE_DELAY = settings_data['debounce_delay'] | '0'
 
 app = FastAPI()
 
@@ -51,4 +53,4 @@ def read_root():
 
 @app.get("/settings")
 def get_settings():
-    return settings_file
+    return settings_data
