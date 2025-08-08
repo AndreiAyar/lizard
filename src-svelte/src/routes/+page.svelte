@@ -25,6 +25,19 @@
 		}
 	}
 
+    async function updateSettings() {
+        try {
+            const request = await fetch('http://localhost:8000/settings');
+
+        
+        
+        }catch(error){
+            console.error("There was an error on updating", error)
+        }
+        
+        
+    }
+
 	function onSliderChange(event: Event) {
 		const value = (event.target as HTMLSelectElement).value;
 		console.log('val changed', value);
