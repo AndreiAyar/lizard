@@ -8,7 +8,7 @@ script_dir = os.path.dirname(os.path.abspath(__file__))
 sound_path = os.path.join(script_dir, "sounds", "lizard_cleaned.wav")
 sound_to_play_on_k_press = sa.WaveObject.from_wave_file(sound_path)
 last_played = 0
-DEBOUNCE_DELAY = 0  # seconds
+DEBOUNCE_DELAY = 0.3  # seconds
  
 
 def on_press(key):
@@ -18,7 +18,8 @@ def on_press(key):
     now = time.time()
     if now - last_played > DEBOUNCE_DELAY:
         if sound_to_play_on_k_press:
-            sound_to_play_on_k_press.play()
+            return
+            #sound_to_play_on_k_press.play()
         last_played = now
 
 # play_obj.wait_done() blocking not needed as for now..
