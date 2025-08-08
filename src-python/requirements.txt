@@ -1,5 +1,5 @@
 fastapi
 pyinstaller
 pynput
-playsound
+simpleaudio
 uvicorn[standard]

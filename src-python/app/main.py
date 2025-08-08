@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from pynput import keyboard
-
+import simpleaudio as sa
 
 def on_press(key):
     print("key pressed {0}".format(key))
