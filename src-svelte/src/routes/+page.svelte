@@ -54,7 +54,7 @@
 
 
 <div class="min-h-screen bg-white flex items-center justify-center p-8">
-    <div class="w-full max-w-xl space-y-8">
+    <div class="w-full max-w-lg space-y-8">
         <!-- Header -->
         <div class="text-center">
             <h1 class="text-6xl font-light text-gray-900 mb-2">🦎</h1>
