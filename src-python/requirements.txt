@@ -1,3 +1,4 @@
 fastapi
 pyinstaller
+pyinput
 uvicorn[standard]
