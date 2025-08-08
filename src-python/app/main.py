@@ -6,7 +6,7 @@ import time
 
 main_dir = os.path.dirname(os.path.abspath(__file__))
 sound_path = os.path.join(main_dir, "sounds", "lizard_cleaned.wav")
-settings_dir =  os.path.join(main_dir, "data", "settings.json")
+settings_file =  os.path.join(main_dir, "data", "settings.json")
 
 sound_to_play_on_k_press = sa.WaveObject.from_wave_file(sound_path)
 
@@ -42,4 +42,4 @@ def read_root():
 
 @app.get("/settings")
 def get_settings():
-    return {"sal": "sal"}
+    return settings_file
