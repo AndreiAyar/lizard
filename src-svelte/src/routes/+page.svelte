@@ -27,7 +27,13 @@
 
     async function updateSettings() {
         try {
-            const request = await fetch('http://localhost:8000/settings');
+            const request = await fetch('http://localhost:8000/settings', {
+                method:"POST",
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ debounce_delay: debounceValue })
+            });
 
         
         
