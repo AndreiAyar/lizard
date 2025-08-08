@@ -42,7 +42,7 @@ def load_settings():
 
 
 settings_data = load_settings()
-DEBOUNCE_DELAY = settings_data.get("debounce_delay", 0.3)
+DEBOUNCE_DELAY = settings_data.get("debounce_delay", 0.1)
 
 app = FastAPI()
 
