@@ -67,8 +67,8 @@
             <div class="space-y-6">
                 <!-- Current Value Display -->
                 <div class="text-center">
-                    <div class="text-4xl font-light text-gray-900 mb-1">
-                        {debounceValue.toFixed(1)}s
+                    <div class={`${debounceValue === default_delay ? 'text-green-600' :'text-gray-900'} text-4xl font-light  mb-1`}>
+                        {debounceValue.toFixed(1)}s {debounceValue === default_delay ? '- best' : null}
                     </div>
                     <div class="text-sm text-gray-500">Delay between sounds</div>
                 </div>
@@ -87,8 +87,8 @@
                     
                     <!-- Range Labels -->
                     <div class="flex justify-between text-xs text-gray-400">
-                        <span class="text-gray-500">Very Fast</span>
-                        <span class="text-green-500 font-medium">Fast</span>
+                        <span class="text-green-500 font-medium">Very Fast</span>
+                        <span class="text-gray-500">Fast</span>
                         <span class="text-gray-500">1s <span class="text-xs font-normal">(Slow)</span></span>
                         <span class="text-gray-500">3s <span class="text-xs font-normal">(Very slow)</span></span>
                         <span class="text-gray-500">5.0s</span>
