@@ -53,7 +53,7 @@
 </script>
 
 <h1>Welcome to SvelteKit</h1>
-Value: {debounceValue}
+Lizards per second: {debounceValue}
 <input
 	type="range"
 	step={0.1}
