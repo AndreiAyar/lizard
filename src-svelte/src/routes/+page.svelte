@@ -27,7 +27,7 @@
 
 	async function updateSettings(value: number) {
 		try {
-			if (value > 0) {
+			if (value >= 0) {
 				const request = await fetch('http://localhost:8000/settings', {
 					method: 'POST',
 					headers: {
@@ -36,9 +36,9 @@
 					body: JSON.stringify({ debounce_delay: debounceValue })
 				});
 
-                if(request.status === 200){
-                    ///Todo
-                }
+				if (request.status === 200) {
+					///Todo
+				}
 			}
 		} catch (error) {
 			console.error('There was an error on updating', error);
@@ -53,7 +53,7 @@
 </script>
 
 <h1>Welcome to SvelteKit</h1>
-
+Value: {debounceValue}
 <input
 	type="range"
 	step={0.1}
