@@ -38,7 +38,7 @@
 
 				if (request.status === 200) {
 					///Todo
-                    debounceValue = value
+					debounceValue = value;
 				}
 			}
 		} catch (error) {
