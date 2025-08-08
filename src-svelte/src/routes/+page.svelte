@@ -82,7 +82,7 @@
                         max="5"
                         bind:value={debounceValue}
                         oninput={onSliderChange}
-                        class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
+                        class="range"
                     />
                     
                     <!-- Range Labels -->
