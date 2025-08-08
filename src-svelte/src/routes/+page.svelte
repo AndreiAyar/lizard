@@ -7,7 +7,7 @@
 
 	async function getSettings() {
 		try {
-			const response = await fetch('localhost:8000/settings', {
+			const response = await fetch('http://localhost:8000/settings', {
 				method: 'GET'
 			});
 			if (!response.ok) {
@@ -30,5 +30,5 @@
 
 <h1>Welcome to SvelteKit</h1>
 
-<input type="range" min={0} max="100" value={debounceValue} onchange={onSliderChange} class="range" />
+<input type="range" step={0.1} min={0.1} max="5" value={debounceValue} onchange={onSliderChange} class="range" />
 <p>Visit <a href="https://svelte.dev/docs/kit">svelte.dev/docs/kit</a> to read the documentation</p>
