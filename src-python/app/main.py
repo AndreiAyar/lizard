@@ -10,7 +10,7 @@ sound_path = os.path.join(script_dir, "sounds", "lizard.wav")
 def on_press(key):
     print("key pressed {0}".format(key))
     sound_to_play_on_k_press = sa.WaveObject.from_wave_file(sound_path)
-    play_obj = sound_to_play_on_k_press.play()
+    sound_to_play_on_k_press.play()
 
 
 # play_obj.wait_done() blocking not needed as for now..
