@@ -38,7 +38,7 @@ def load_settings():
         with open(settings_file, "r") as f:
             return json.load(f)
     else:
-        return {"debounce_delay", 0.3}
+        return {"debounce_delay": 0.3}
 
 
 settings_data = load_settings()
