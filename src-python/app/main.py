@@ -22,8 +22,6 @@ def on_press(key):
             sound_to_play_on_k_press.play()
         last_played = now
 
-
-
 # play_obj.wait_done() blocking not needed as for now..
 
 
