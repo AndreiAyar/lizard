@@ -21,8 +21,8 @@ def on_press(key):
     now = time.time()
     if now - last_played > DEBOUNCE_DELAY:
         if sound_to_play_on_k_press:
-            return
-            # sound_to_play_on_k_press.play()
+           # return
+           sound_to_play_on_k_press.play()
         last_played = now
 
 
