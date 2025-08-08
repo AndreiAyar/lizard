@@ -93,7 +93,7 @@ def read_root():
 
 @app.get("/settings")
 def get_settings():
-    return settings_data
+    return load_settings()
 
 
 @app.post("/settings")
