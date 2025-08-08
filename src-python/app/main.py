@@ -14,6 +14,7 @@ sound_to_play_on_k_press = sa.WaveObject.from_wave_file(sound_path)
 last_played = 0
 
 
+
 def on_press(key):
     print("key pressed {0}".format(key))
 
@@ -82,4 +83,3 @@ def get_settings():
 @app.post("/settings")
 def post_settings(new_settings: dict):
     return update_settings(new_settings)
-
