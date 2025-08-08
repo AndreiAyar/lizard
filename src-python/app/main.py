@@ -45,6 +45,22 @@ def save_settings(settings):
     with open(settings_file, "w") as f:
         json.dump(settings, f)
 
+def update_settings(new_settings: dict):
+    global settings_data, DEBOUNCE_DELAY
+    debounce = new_settings.get("debounce_delay")
+    if debounce is not None:
+        try:
+            debounce = float(debounce)
+        except ValueError:
+            return {"error": "Invalid debounce delay value. Must be a number."}
+        if debounce < 0:
+            return {"error": "Debounce delay must be a non-negative number."}
+        settings_data["debounce_delay"] = debounce
+        save_settings(settings_data)
+        DEBOUNCE_DELAY = debounce
+    return {"message": "Settings updated"}
+
+
 
 settings_data = load_settings()
 DEBOUNCE_DELAY = settings_data.get("debounce_delay", 0.1)
@@ -61,18 +77,7 @@ def read_root():
 def get_settings():
     return settings_data
 
+@app.post("/settings")
+def post_settings(new_settings: dict):
+    return update_settings(new_settings)
 
-def update_settings(new_settings: dict):
-    global settings_data, DEBOUNCE_DELAY
-    debounce = new_settings.get("debounce_delay")
-    if debounce is not None:
-        try:
-            debounce = float(debounce)
-        except ValueError:
-            return {"error": "Invalid debounce delay value. Must be a number."}
-        if debounce < 0:
-            return {"error": "Debounce delay must be a non-negative number."}
-        settings_data["debounce_delay"] = debounce
-        save_settings(settings_data)
-        DEBOUNCE_DELAY = debounce
-    return {"message": "Settings updated"}
