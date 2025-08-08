@@ -87,10 +87,11 @@
                     
                     <!-- Range Labels -->
                     <div class="flex justify-between text-xs text-gray-400">
-                        <span>0.1s</span>
-                        <span>Fast</span>
-                        <span>Slow</span>
-                        <span>5.0s</span>
+                        <span class="text-gray-500">0.1s</span>
+                        <span class="text-green-500 font-medium">0.3s<br /><span class="text-xs font-normal">Default</span></span>
+                        <span class="text-gray-500">1s<br /><span class="text-xs font-normal">Slow</span></span>
+                        <span class="text-gray-500">3s<br /><span class="text-xs font-normal">Very slow</span></span>
+                        <span class="text-gray-500">5.0s</span>
                     </div>
                 </div>
             </div>
