@@ -1,7 +1,17 @@
 from fastapi import FastAPI
 from pynput import keyboard
 
+
+def on_press(key):
+    print("key pressed {0}".format(key.char))
+
+
+listener = keyboard.Listener(on_press=on_press)
+listener.start()
+
+
 app = FastAPI()
+
 
 @app.get("/")
 def read_root():
