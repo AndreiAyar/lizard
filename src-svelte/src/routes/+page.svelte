@@ -33,12 +33,12 @@
 					headers: {
 						'Content-Type': 'application/json'
 					},
-					body: JSON.stringify({ debounce_delay: debounceValue })
+					body: JSON.stringify({ debounce_delay: value })
 				});
 
 				if (request.status === 200) {
 					///Todo
-                    debounceValue = default_delay
+                   // debounceValue = default_delay
 				}
 			}
 		} catch (error) {
