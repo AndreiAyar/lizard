@@ -38,7 +38,7 @@
 
 				if (request.status === 200) {
 					///Todo
-                   // debounceValue = default_delay
+                    debounceValue = value
 				}
 			}
 		} catch (error) {
