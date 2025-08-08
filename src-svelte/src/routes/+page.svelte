@@ -57,9 +57,9 @@
 <input
 	type="range"
 	step={0.1}
-	min={0.1}
+	min={0}
 	max="5"
-	value={debounceValue}
+	bind:value={debounceValue}
 	onchange={onSliderChange}
 	class="range"
 />
