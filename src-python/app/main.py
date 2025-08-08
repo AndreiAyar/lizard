@@ -35,3 +35,8 @@ app = FastAPI()
 @app.get("/")
 def read_root():
     return {"message": "Hello from Python backend!"}
+
+
+@app.get("/settings")
+def get_settings():
+    return {"sal": "sal"}
