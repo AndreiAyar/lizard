@@ -2,9 +2,11 @@
   "name": "lizard-app",
   "private": true,
   "scripts": {
-    "dev": "concurrently \"npm run dev:python\" \"npm run dev:tauri\"",
+    "dev": "concurrently --kill-others \"npm run dev:python\" \"npm run dev:tauri\"",
     "dev:python": "cd src-python && source venv/bin/activate && uvicorn app.main:app --reload --port 8000",
     "dev:tauri": "cd src-tauri && cargo tauri dev",
+    "cleanup": "pkill -f 'uvicorn app.main:app' || true",
+    "stop": "npm run cleanup",
     "build": "npm run build:frontend && npm run build:tauri",
     "build:frontend": "cd src-svelte && npm run build",
     "build:tauri": "cd src-tauri && cargo tauri build"
