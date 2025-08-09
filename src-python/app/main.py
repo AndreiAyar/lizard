@@ -30,6 +30,8 @@ sound_to_play_on_k_press = sa.WaveObject.from_wave_file(sound_path)
 last_played = 0
 
 from contextlib import asynccontextmanager
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup
@@ -39,25 +41,17 @@ async def lifespan(app: FastAPI):
     logger.info(f"Main directory: {main_dir}")
     logger.info(f"Sound path: {sound_path}")
     logger.info(f"Settings file: {settings_file}")
-    
+
     # Check if files exist
     logger.info(f"Sound file exists: {os.path.exists(sound_path)}")
     logger.info(f"Settings file exists: {os.path.exists(settings_file)}")
-    
+
     yield
     # Shutdown
     logger.info("=== LIZARD BACKEND SHUTTING DOWN ===")
 
+
 app = FastAPI(lifespan=lifespan)
-
-
-@app.on_event("startup")
-async def startup_event():
-    logger.info("=== LIZARD BACKEND STARTING ===")
-    logger.info(f"Python version: {sys.version}")
-    logger.info(f"Working directory: {os.getcwd()}")
-    logger.info(f"Python path: {sys.path}")
-    logger.info(f"Environment: {dict(os.environ)}")
 
 
 def on_press(key):
