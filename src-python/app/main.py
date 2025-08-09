@@ -55,7 +55,7 @@ app = FastAPI(lifespan=lifespan)
 
 
 def on_press(key):
-    print("key pressed {0}".format(key))
+    # print("key pressed {0}".format(key))
     if app_status == "off":
         return
     global last_played
