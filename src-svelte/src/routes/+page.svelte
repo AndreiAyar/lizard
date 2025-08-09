@@ -56,7 +56,6 @@
 				});
 
 				if (request.status === 200) {
-					///Todo
 					debounceValue = value;
 				}
 			}
@@ -68,7 +67,6 @@
 	function onSliderChange(event: Event) {
 		const value = (event.target as HTMLSelectElement).value;
 		updateSettings(+value);
-		console.log('val changed', value);
 	}
 </script>
 
