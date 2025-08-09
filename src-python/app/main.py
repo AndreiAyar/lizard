@@ -1,11 +1,23 @@
 from fastapi import FastAPI
 from pynput import keyboard
 import simpleaudio as sa
+import logging
 import os
 import time
 import json
 from fastapi.middleware.cors import CORSMiddleware
 
+# Set up logging
+logging.basicConfig(
+    level=logging.DEBUG,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    handlers=[
+        logging.FileHandler("/tmp/lizard-backend.log"),  # Log to file
+        logging.StreamHandler(sys.stdout),  # Also log to console
+    ],
+)
+
+logger = logging.getLogger(__name__)
 
 main_dir = os.path.dirname(os.path.abspath(__file__))
 sound_path = os.path.join(main_dir, "sounds", "lizard_cleaned.wav")
@@ -15,6 +27,16 @@ app_status = "on"
 sound_to_play_on_k_press = sa.WaveObject.from_wave_file(sound_path)
 
 last_played = 0
+app = FastAPI()
+
+
+@app.on_event("startup")
+async def startup_event():
+    logger.info("=== LIZARD BACKEND STARTING ===")
+    logger.info(f"Python version: {sys.version}")
+    logger.info(f"Working directory: {os.getcwd()}")
+    logger.info(f"Python path: {sys.path}")
+    logger.info(f"Environment: {dict(os.environ)}")
 
 
 def on_press(key):
@@ -71,7 +93,6 @@ def update_settings(new_settings: dict):
 settings_data = load_settings()
 DEBOUNCE_DELAY = settings_data.get("debounce_delay", 0.1)
 
-app = FastAPI()
 
 origins = [
     "http://localhost",
