@@ -6,6 +6,7 @@ import logging
 import os
 import time
 import json
+import uvicorn
 from fastapi.middleware.cors import CORSMiddleware
 
 # Set up logging
@@ -146,3 +147,19 @@ def get_settings():
 @app.post("/settings")
 def post_settings(new_settings: dict):
     return update_settings(new_settings)
+
+
+
+# START THE SERVER
+if __name__ == "__main__":
+    logger.info("=== STARTING UVICORN SERVER ===")
+    try:
+        uvicorn.run(
+            app,
+            host="0.0.0.0",
+            port=8000,
+            log_level="info"
+        )
+    except Exception as e:
+        logger.error(f"Failed to start server: {e}")
+        raise
