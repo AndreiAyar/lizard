@@ -22,7 +22,7 @@ fn stop_python_server(state: State<PythonProcess>) {
 fn find_backend_path(app: &tauri::App) -> Option<std::path::PathBuf> {
     let resource_dir = app.path().resource_dir().unwrap();
     
-    // Try different possible locations
+    // cchecking different possible locations..
     let possible_paths = vec![
         // Direct in resources (Windows/Linux)
         resource_dir.join("lizard-backend"),
