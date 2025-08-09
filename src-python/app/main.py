@@ -31,7 +31,6 @@ last_played = 0
 
 from contextlib import asynccontextmanager
 
-
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup
