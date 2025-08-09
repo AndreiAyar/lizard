@@ -1,6 +1,6 @@
 use std::process::{Child, Command};
 use std::sync::Mutex;
-use tauri::State;
+use tauri::{Manager, State}; // Add Manager trait
 
 struct PythonProcess(Mutex<Option<Child>>);
 
@@ -25,28 +25,5 @@ pub fn run() {
         .manage(PythonProcess(Mutex::new(None)))
         .setup(|app| {
             // Start Python server
-            let python_process = Command::new("python")
-                .args(["-m", "uvicorn", "app.main:app", "--reload", "--port", "8000"])
-                .current_dir("../src-python")
-                .spawn()
-                .expect("Failed to start Python server");
-            
-            let state: State<PythonProcess> = app.state();
-            *state.0.lock().unwrap() = Some(python_process);
-            
-            Ok(())
-        })
-        .on_window_event(|event| {
-            if let tauri::WindowEvent::CloseRequested { .. } = event.event() {
-                // Kill Python process when window closes
-                let state: State<PythonProcess> = event.window().state();
-                let mut process = state.0.lock().unwrap();
-                if let Some(ref mut child) = *process {
-                    let _ = child.kill();
-                }
-            }
-        })
-        .invoke_handler(tauri::generate_handler![greet, stop_python_server])
-        .run(tauri::generate_context!())
-        .expect("error while running tauri application");
-}
+            let python_process = Command::new("python3") // Use python3 explicitly
+                .args(["-m", "uvicorn", "app.main:app", "--reload", "
