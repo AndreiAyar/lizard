@@ -1,7 +1,7 @@
 use std::process::{Child, Command};
 use std::sync::Mutex;
 use tauri::{Manager, State};
-use std::env;
+use std::path::Path;
 
 struct PythonProcess(Mutex<Option<Child>>);
 
@@ -25,7 +25,7 @@ pub fn run() {
         .plugin(tauri_plugin_opener::init())
         .manage(PythonProcess(Mutex::new(None)))
         .setup(|app| {
-            // Get the path to the bundled Python executable
+            // Try to find the Python backend
             let resource_dir = app.path().resource_dir().unwrap();
             let backend_path = if cfg!(target_os = "windows") {
                 resource_dir.join("lizard-backend.exe")
@@ -33,13 +33,35 @@ pub fn run() {
                 resource_dir.join("lizard-backend")
             };
             
-            // Start bundled Python server
-            let python_process = Command::new(backend_path)
-                .spawn()
-                .expect("Failed to start Python server");
-            
-            let state: State<PythonProcess> = app.state();
-            *state.0.lock().unwrap() = Some(python_process);
+            // Only start Python if the executable exists
+            if Path::new(&backend_path).exists() {
+                match Command::new(&backend_path).spawn() {
+                    Ok(python_process) => {
+                        let state: State<PythonProcess> = app.state();
+                        *state.0.lock().unwrap() = Some(python_process);
+                        println!("Python backend started successfully");
+                    }
+                    Err(e) => {
+                        eprintln!("Failed to start Python backend: {}", e);
+                        // Don't panic, just continue without Python backend
+                    }
+                }
+            } else {
+                println!("Python backend not found at: {:?}", backend_path);
+                // In development, try to start Python directly
+                #[cfg(debug_assertions)]
+                {
+                    if let Ok(python_process) = Command::new("python3")
+                        .args(["-m", "uvicorn", "app.main:app", "--reload", "--port", "8000"])
+                        .current_dir("../src-python")
+                        .spawn()
+                    {
+                        let state: State<PythonProcess> = app.state();
+                        *state.0.lock().unwrap() = Some(python_process);
+                        println!("Development Python backend started");
+                    }
+                }
+            }
             
             Ok(())
         })
