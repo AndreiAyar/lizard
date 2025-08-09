@@ -93,11 +93,12 @@ def read_root():
 
 @app.post('/toggle')
 def toggle_app():
+    global app_status
     if app_status == 'on':
         app_status = 'off'
     else:
         app_status = 'on'
-    return app_status
+    return {"app_status": app_status}
 
 @app.get("/settings")
 def get_settings():
