@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "identifier": "com.ayar.tauri-app",
   "build": {
-    "beforeDevCommand": "concurrently \"cd ../src-python && uvicorn app.main:app --reload --port 8000\" \"cd ../src-svelte && npm run dev\"",
+    "beforeDevCommand": "cd ./src-svelte && npm run dev",
     "devUrl": "http://localhost:1420"
   },
   "app": {
