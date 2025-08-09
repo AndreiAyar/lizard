@@ -1,0 +1,15 @@
+{
+  "name": "lizard-app",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"npm run dev:python\" \"npm run dev:tauri\"",
+    "dev:python": "cd src-python && uvicorn app.main:app --reload --port 8000",
+    "dev:tauri": "cd src-tauri && cargo tauri dev",
+    "build": "npm run build:frontend && npm run build:tauri",
+    "build:frontend": "cd src-svelte && npm run build",
+    "build:tauri": "cd src-tauri && cargo tauri build"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
