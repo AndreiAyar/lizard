@@ -5,6 +5,8 @@
   "identifier": "com.ayar.tauri-app",
   "build": {
     "beforeDevCommand": "cd ./src-svelte && npm run dev",
+     "beforeBuildCommand": "npm run build:python && cd ../src-svelte && npm run build",
+    "frontendDist": "../src-svelte/build",
     "devUrl": "http://localhost:1420"
   },
   "app": {
