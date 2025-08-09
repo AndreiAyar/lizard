@@ -13,8 +13,8 @@ logging.basicConfig(
     level=logging.DEBUG,
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     handlers=[
-        logging.FileHandler("/tmp/lizard-backend.log"),  # Log to file
-        logging.StreamHandler(sys.stdout),  # Also log to console
+        logging.FileHandler("/tmp/lizard-backend.log"),
+        logging.StreamHandler(sys.stdout),
     ],
 )
 
