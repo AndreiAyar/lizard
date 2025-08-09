@@ -1,4 +1,4 @@
-use std::process::{Child, Command};
+use std::process::{Child, Command, Stdio};
 use std::sync::Mutex;
 use tauri::{Manager, State};
 
@@ -13,7 +13,37 @@ fn greet(name: &str) -> String {
 fn stop_python_server(state: State<PythonProcess>) {
     let mut process = state.0.lock().unwrap();
     if let Some(ref mut child) = *process {
-        let _ = child.kill();
+        println!("Attempting to stop Python backend...");
+        
+        // Try graceful termination first
+        match child.kill() {
+            Ok(_) => {
+                println!("Kill signal sent successfully");
+                
+                match child.wait() {
+                    Ok(status) => println!("Backend process terminated with status: {}", status),
+                    Err(e) => eprintln!("Error waiting for process termination: {}", e),
+                }
+            }
+            Err(e) => {
+                eprintln!("Failed to kill backend process: {}", e);
+                // Try platform-specific force kill as a last resort
+                #[cfg(unix)]
+                {
+                    println!("Force killing with SIGKILL: {}", child.id());
+                    let _ = std::process::Command::new("kill")
+                        .args(["-9", &child.id().to_string()])
+                        .status();
+                }
+                #[cfg(windows)]
+                {
+                    println!("Force killing with taskkill: {}", child.id());
+                    let _ = std::process::Command::new("taskkill")
+                        .args(["/F", "/PID", &child.id().to_string()])
+                        .status();
+                }
+            }
+        }
         *process = None;
     }
 }
@@ -64,64 +94,94 @@ pub fn run() {
                 }
             }
             
-            // Try to find the backend executable
-            if let Some(backend_path) = find_backend_path(app) {
-                // Make sure it's executable on Unix systems
-                #[cfg(unix)]
-                {
-                    use std::os::unix::fs::PermissionsExt;
-                    if let Ok(metadata) = std::fs::metadata(&backend_path) {
-                        let permissions = metadata.permissions();
-                        if (permissions.mode() & 0o111) == 0 {
-                            println!("Making backend executable...");
-                            let _ = std::process::Command::new("chmod")
-                                .args(["+x", backend_path.to_str().unwrap()])
-                                .output();
+            // Only start packaged backend in production mode
+            #[cfg(not(debug_assertions))]
+            {
+                if let Some(backend_path) = find_backend_path(app) {
+                    // Make sure it's executable on Unix systems
+                    #[cfg(unix)]
+                    {
+                        use std::os::unix::fs::PermissionsExt;
+                        if let Ok(metadata) = std::fs::metadata(&backend_path) {
+                            let permissions = metadata.permissions();
+                            if (permissions.mode() & 0o111) == 0 {
+                                println!("Making backend executable...");
+                                let _ = std::process::Command::new("chmod")
+                                    .args(["+x", backend_path.to_str().unwrap()])
+                                    .output();
+                            }
                         }
                     }
-                }
-                
-                match Command::new(&backend_path).spawn() {
-                    Ok(python_process) => {
-                        // Get the PID before moving the process
-                        let pid = python_process.id();
-                        let state: State<PythonProcess> = app.state();
-                        *state.0.lock().unwrap() = Some(python_process);
-                        println!("Python backend started successfully with PID: {}", pid);
-                    }
-                    Err(e) => {
-                        eprintln!("Failed to start Python backend: {}", e);
-                    }
-                }
-            } else {
-                println!("Python backend not found in any expected location");
-                
-                // Development fallback
-                #[cfg(debug_assertions)]
-                {
-                    println!("Trying development mode...");
-                    if let Ok(python_process) = Command::new("python3")
-                        .args(["-m", "uvicorn", "app.main:app", "--reload", "--port", "8000"])
-                        .current_dir("../src-python")
+                    
+                    match Command::new(&backend_path)
+                        .stdin(Stdio::null())
+                        .stdout(Stdio::null())
+                        .stderr(Stdio::null())
                         .spawn()
                     {
-                        let pid = python_process.id();
-                        let state: State<PythonProcess> = app.state();
-                        *state.0.lock().unwrap() = Some(python_process);
-                        println!("Development Python backend started with PID: {}", pid);
+                        Ok(python_process) => {
+                            let pid = python_process.id();
+                            println!("Python backend started successfully with PID: {}", pid);
+                            let state: State<PythonProcess> = app.state();
+                            *state.0.lock().unwrap() = Some(python_process);
+                        }
+                        Err(e) => {
+                            eprintln!("Failed to start Python backend: {}", e);
+                        }
                     }
+                } else {
+                    println!("Python backend not found in any expected location");
                 }
+            }
+            
+            // In development mode, we expect you to run `python main.py` manually
+            #[cfg(debug_assertions)]
+            {
+                println!("Development mode: Start your Python backend manually with 'python main.py'");
             }
             
             Ok(())
         })
-        .on_window_event(|_window, event| {
+        .on_window_event(|window, event| {
             if let tauri::WindowEvent::CloseRequested { .. } = event {
-                let state: State<PythonProcess> = _window.state();
-                let mut process = state.0.lock().unwrap();
-                if let Some(ref mut child) = *process {
-                    let _ = child.kill();
-                    println!("Backend process killed on window close");
+                #[cfg(not(debug_assertions))]
+                {
+                    println!("Window close requested, attempting to stop backend...");
+                    let state: State<PythonProcess> = window.state();
+                    let mut process_lock = state.0.lock().unwrap();
+                    if let Some(ref mut child) = *process_lock {
+                        let pid = child.id();
+                        println!("Killing backend process with PID: {}", pid);
+                        match child.kill() {
+                            Ok(_) => {
+                                println!("Kill signal sent to PID: {}", pid);
+                                match child.wait() {
+                                    Ok(status) => println!("Backend process terminated with status: {}", status),
+                                    Err(e) => eprintln!("Error waiting for backend process: {}", e),
+                                }
+                            }
+                            Err(e) => {
+                                eprintln!("Failed to kill backend process: {}", e);
+                                #[cfg(unix)]
+                                {
+                                    println!("Force killing with SIGKILL: {}", pid);
+                                    let _ = std::process::Command::new("kill")
+                                        .args(["-9", &pid.to_string()])
+                                        .status();
+                                }
+                                #[cfg(windows)]
+                                {
+                                    println!("Force killing with taskkill: {}", pid);
+                                    let _ = std::process::Command::new("taskkill")
+                                        .args(["/F", "/PID", &pid.to_string()])
+                                        .status();
+                                }
+                            }
+                        }
+                        *process_lock = None;
+                    } else {
+                        println!("No backend process to kill");
+                    }
                 }
             }
         })

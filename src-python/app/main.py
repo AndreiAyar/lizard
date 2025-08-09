@@ -1,6 +1,4 @@
 from fastapi import FastAPI
-from pynput import keyboard
-import simpleaudio as sa
 import sys
 import logging
 import os
@@ -8,17 +6,10 @@ import time
 import json
 import uvicorn
 from fastapi.middleware.cors import CORSMiddleware
+import signal
 
-# Set up logging
-logging.basicConfig(
-    level=logging.DEBUG,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-    handlers=[
-        logging.FileHandler("/tmp/lizard-backend.log"),
-        logging.StreamHandler(sys.stdout),
-    ],
-)
-
+# Set up minimal logging initially
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 main_dir = os.path.dirname(os.path.abspath(__file__))
@@ -26,9 +17,11 @@ sound_path = os.path.join(main_dir, "sounds", "lizard_cleaned.wav")
 settings_file = os.path.join(main_dir, "data", "settings.json")
 app_status = "on"
 
-sound_to_play_on_k_press = sa.WaveObject.from_wave_file(sound_path)
-
+# Lazy-loaded globals
+sound_to_play_on_k_press = None
+listener = None
 last_played = 0
+backend_ready = False
 
 from contextlib import asynccontextmanager
 
@@ -36,42 +29,49 @@ from contextlib import asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup
     logger.info("=== LIZARD BACKEND STARTING ===")
-    logger.info(f"Python version: {sys.version}")
-    logger.info(f"Working directory: {os.getcwd()}")
-    logger.info(f"Main directory: {main_dir}")
-    logger.info(f"Sound path: {sound_path}")
-    logger.info(f"Settings file: {settings_file}")
-
-    # Check if files exist
-    logger.info(f"Sound file exists: {os.path.exists(sound_path)}")
-    logger.info(f"Settings file exists: {os.path.exists(settings_file)}")
-
+    
+    # Start background initialization
+    import asyncio
+    asyncio.create_task(initialize_backend())
+    
     yield
     # Shutdown
+    global listener
+    if listener:
+        listener.stop()
     logger.info("=== LIZARD BACKEND SHUTTING DOWN ===")
 
+async def initialize_backend():
+    """Initialize heavy components asynchronously"""
+    global sound_to_play_on_k_press, listener, backend_ready
+    
+    try:
+        # Load audio file
+        import simpleaudio as sa
+        sound_to_play_on_k_press = sa.WaveObject.from_wave_file(sound_path)
+        
+        # Start keyboard listener
+        from pynput import keyboard
+        listener = keyboard.Listener(on_press=on_press)
+        listener.start()
+        
+        backend_ready = True
+        logger.info("Backend initialization complete")
+        
+    except Exception as e:
+        logger.error(f"Backend initialization failed: {e}")
 
 app = FastAPI(lifespan=lifespan)
 
-
 def on_press(key):
-    # print("key pressed {0}".format(key))
-    if app_status == "off":
+    if app_status == "off" or not backend_ready:
         return
     global last_played
     now = time.time()
     if now - last_played > DEBOUNCE_DELAY:
         if sound_to_play_on_k_press:
-            # return
             sound_to_play_on_k_press.play()
         last_played = now
-
-
-# play_obj.wait_done() blocking not needed as for now..
-
-
-listener = keyboard.Listener(on_press=on_press)
-listener.start()
 
 
 def load_settings():
@@ -109,11 +109,7 @@ settings_data = load_settings()
 DEBOUNCE_DELAY = settings_data.get("debounce_delay", 0.1)
 
 
-origins = [
-    "http://localhost",
-    "http://localhost:1420",
-    "http://localhost:8080",
-]
+origins = ["*"]
 
 app.add_middleware(
     CORSMiddleware,
@@ -126,7 +122,12 @@ app.add_middleware(
 
 @app.get("/")
 def read_root():
-    return {"message": "Hello from Python backend!"}
+    return {"message": "Hello from Python backend!", "ready": backend_ready}
+
+
+@app.get("/health")
+def health_check():
+    return {"status": "running", "ready": backend_ready}
 
 
 @app.post("/toggle")
@@ -148,6 +149,18 @@ def get_settings():
 def post_settings(new_settings: dict):
     return update_settings(new_settings)
 
+def signal_handler(signum, frame):
+    """Handle termination signals"""
+    logger.info(f"Received signal {signum}, shutting down...")
+    global listener
+    if listener:
+        listener.stop()
+    sys.exit(0)
+
+# Register signal handlers
+signal.signal(signal.SIGTERM, signal_handler)
+signal.signal(signal.SIGINT, signal_handler)
+
 # START THE SERVER
 if __name__ == "__main__":
     logger.info("=== STARTING UVICORN SERVER ===")
@@ -156,8 +169,13 @@ if __name__ == "__main__":
             app,
             host="0.0.0.0",
             port=8000,
-            log_level="info"
+            log_level="warning"
         )
+    except KeyboardInterrupt:
+        logger.info("Received keyboard interrupt, shutting down...")
     except Exception as e:
         logger.error(f"Failed to start server: {e}")
         raise
+    finally:
+        if listener:
+            listener.stop()
