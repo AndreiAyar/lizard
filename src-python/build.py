@@ -34,6 +34,8 @@ else:  # Linux
     target_triple = "x86_64-unknown-linux-gnu"
     exe_name = f"lizard-backend-{target_triple}"
 
+exe_name = 'lizard-backend'
+
 PyInstaller.__main__.run([
     main_py,
     '--onefile',
