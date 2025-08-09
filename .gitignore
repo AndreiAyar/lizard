@@ -18,6 +18,8 @@ lib/
 lib64/
 parts/
 sdist/
+binaries/
+lizard-backend/
 var/
 wheels/
 share/python-wheels/
