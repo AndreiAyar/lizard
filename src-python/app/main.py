@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from pynput import keyboard
 import simpleaudio as sa
+import sys
 import logging
 import os
 import time
