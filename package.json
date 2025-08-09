@@ -7,7 +7,8 @@
     "dev:tauri": "cd src-tauri && cargo tauri dev",
     "cleanup": "pkill -f 'uvicorn app.main:app' || true",
     "stop": "npm run cleanup",
-    "build": "npm run build:frontend && npm run build:tauri",
+    "build": "npm run build:python && npm run build:frontend && npm run build:tauri",
+    "build:python": "cd src-python && source venv/bin/activate && python build.py",
     "build:frontend": "cd src-svelte && npm run build",
     "build:tauri": "cd src-tauri && cargo tauri build"
   },
