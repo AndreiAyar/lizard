@@ -148,8 +148,6 @@ def get_settings():
 def post_settings(new_settings: dict):
     return update_settings(new_settings)
 
-
-
 # START THE SERVER
 if __name__ == "__main__":
     logger.info("=== STARTING UVICORN SERVER ===")
