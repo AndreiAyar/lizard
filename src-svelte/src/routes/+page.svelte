@@ -59,6 +59,7 @@
 		<div class="text-center">
 			<h1 class="mb-2 text-6xl font-light text-gray-900">🦎</h1>
 			<h2 class="mb-1 text-3xl font-light text-gray-800">LIZARD</h2>
+            <input type="checkbox" checked={true} class="toggle toggle-success" />
 			<p class="text-sm text-gray-500">Keypress sound settings</p>
 		</div>
 
@@ -117,6 +118,8 @@
 </div>
 
 <style>
+
+
 	.slider::-webkit-slider-thumb {
 		appearance: none;
 		height: 20px;
