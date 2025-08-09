@@ -3,6 +3,7 @@
 	const default_delay = 0.3;
 	let settings: Record<string, number | string>;
 	let debounceValue: number = $state(default_delay);
+	let app_status: 'on' | 'off' = $state('on');
 	onMount(async () => {
 		settings = await getSettings();
 		debounceValue = settings?.debounce_delay as number;
@@ -60,7 +61,7 @@
 			<h1 class="mb-2 text-6xl font-light text-gray-900">🦎</h1>
 			<h2 class="mb-1 text-3xl font-light text-gray-800">LIZARD</h2>
 			<label class=" inline-flex cursor-pointer items-center">
-				<input type="checkbox" class="peer sr-only" checked />
+				<input type="checkbox" class="peer sr-only" checked={app_status === 'on'} />
 				<div
 					class="peer relative h-6 w-11 rounded-full bg-gray-200 after:absolute after:start-[2px] after:top-0.5 after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-green-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:ring-4 peer-focus:ring-green-300 rtl:peer-checked:after:-translate-x-full dark:border-gray-600 dark:bg-gray-700 dark:peer-checked:bg-green-600 dark:peer-focus:ring-green-800"
 				></div>
