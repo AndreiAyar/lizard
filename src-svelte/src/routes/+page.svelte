@@ -20,7 +20,7 @@
 			const response = await request.json();
 
 			if (request.status === 200) {
-				isAppOn = response.app_status === 'on';
+				isAppOn = response?.app_status === 'on';
 			}
 		} catch (error) {
 			console.error('There was an error on updating', error);
