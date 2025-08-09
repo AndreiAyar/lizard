@@ -2,7 +2,7 @@
   "$schema": "https://schema.tauri.app/config/2",
   "productName": "Lizard",
   "version": "0.1.0",
-  "identifier": "com.ayar.tauri-app",
+  "identifier": "com.ayar.lizard-keyboard",
   "build": {
     "beforeDevCommand": "cd ./src-svelte && npm run dev",
     "beforeBuildCommand": "npm run build:python && cd ./src-svelte && npm run build",
@@ -13,7 +13,7 @@
     "withGlobalTauri": true,
     "windows": [
       {
-        "title": "Lizzard. Lizzard. Lizzard",
+        "title": "Lizard. Lizard. Lizard",
         "width": 600,
         "height": 700
       }
