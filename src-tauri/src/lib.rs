@@ -1,7 +1,6 @@
 use std::process::{Child, Command};
 use std::sync::Mutex;
 use tauri::{Manager, State};
-use std::path::Path;
 
 struct PythonProcess(Mutex<Option<Child>>);
 
@@ -22,7 +21,7 @@ fn stop_python_server(state: State<PythonProcess>) {
 fn find_backend_path(app: &tauri::App) -> Option<std::path::PathBuf> {
     let resource_dir = app.path().resource_dir().unwrap();
     
-    // cchecking different possible locations..
+    // checking different possible locations..
     let possible_paths = vec![
         // Direct in resources (Windows/Linux)
         resource_dir.join("lizard-backend"),
@@ -84,9 +83,11 @@ pub fn run() {
                 
                 match Command::new(&backend_path).spawn() {
                     Ok(python_process) => {
+                        // Get the PID before moving the process
+                        let pid = python_process.id();
                         let state: State<PythonProcess> = app.state();
                         *state.0.lock().unwrap() = Some(python_process);
-                        println!("Python backend started successfully with PID: {}", python_process.id());
+                        println!("Python backend started successfully with PID: {}", pid);
                     }
                     Err(e) => {
                         eprintln!("Failed to start Python backend: {}", e);
@@ -104,9 +105,10 @@ pub fn run() {
                         .current_dir("../src-python")
                         .spawn()
                     {
+                        let pid = python_process.id();
                         let state: State<PythonProcess> = app.state();
                         *state.0.lock().unwrap() = Some(python_process);
-                        println!("Development Python backend started");
+                        println!("Development Python backend started with PID: {}", pid);
                     }
                 }
             }
