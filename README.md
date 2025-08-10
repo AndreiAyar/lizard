@@ -2,6 +2,7 @@
 
 Welcome to **Lizard** – the only keyboard sound app that outputs pure, unfiltered lizard energy.  
 Ever wanted your keystrokes to sound like the latest lizard meme? Now, they do.
+<img width="629" height="738" alt="Screenshot 2025-08-10 at 22 09 47" src="https://github.com/user-attachments/assets/1e0249e5-901e-487f-b44b-f6aef2397863" />
 
 ## What is this?
 
