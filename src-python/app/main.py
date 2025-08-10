@@ -60,7 +60,6 @@ last_played = 0
 
 from contextlib import asynccontextmanager
 
-
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup
@@ -168,7 +167,6 @@ app.add_middleware(
 @app.get("/")
 def read_root():
     return {"message": "Hello from Python backend!", "ready": backend_ready}
-
 
 @app.get("/health")
 def health_check():
