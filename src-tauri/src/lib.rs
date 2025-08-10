@@ -1,140 +1,95 @@
 use std::process::{Child, Command, Stdio};
 use std::sync::Mutex;
-use std::fs;
-use std::net::TcpListener;
-use std::path::PathBuf;
-use std::io::Write;
 use tauri::{Manager, State};
 
 struct PythonProcess(Mutex<Option<Child>>);
 
-const BACKEND_PORT: u16 = 8000;
-const PID_FILE_NAME: &str = "lizard_backend.pid";
-
-fn get_pid_file_path(app: &tauri::App) -> PathBuf {
-    app.path().app_data_dir().unwrap_or_else(|_| std::env::temp_dir()).join(PID_FILE_NAME)
-}
-
-fn get_pid_file_path_from_handle(app_handle: &tauri::AppHandle) -> PathBuf {
-    app_handle.path().app_data_dir().unwrap_or_else(|_| std::env::temp_dir()).join(PID_FILE_NAME)
-}
-
-fn is_port_available(port: u16) -> bool {
-    TcpListener::bind(format!("127.0.0.1:{}", port)).is_ok()
-}
-
-fn is_process_running(pid: u32) -> bool {
+// Add function to kill all lizard-backend processes by name
+fn kill_all_lizard_backends() {
+    println!("Killing all lizard-backend processes...");
+    
     #[cfg(unix)]
     {
-        std::process::Command::new("kill")
-            .args(["-0", &pid.to_string()])
+        // Use pkill to kill all processes with name containing lizard-backend
+        match std::process::Command::new("pkill")
+            .args(["-f", "lizard-backend"])
             .status()
-            .map(|status| status.success())
-            .unwrap_or(false)
-    }
-    #[cfg(windows)]
-    {
-        std::process::Command::new("tasklist")
-            .args(["/FI", &format!("PID eq {}", pid)])
-            .output()
-            .map(|output| String::from_utf8_lossy(&output.stdout).contains(&pid.to_string()))
-            .unwrap_or(false)
-    }
-}
-
-// Replace dangerous kill_all_lizard_backends with safer approach
-fn cleanup_our_backend_processes(app_path_resolver: Option<&tauri::App>, app_handle: Option<&tauri::AppHandle>) {
-    println!("Cleaning up our backend processes safely...");
-    
-    // Get PID file path based on what's available
-    let pid_file = if let Some(app) = app_path_resolver {
-        get_pid_file_path(app)
-    } else if let Some(handle) = app_handle {
-        get_pid_file_path_from_handle(handle)
-    } else {
-        return;
-    };
-    
-    // Read our PID file and kill only our process
-    if let Ok(pid_str) = fs::read_to_string(&pid_file) {
-        if let Ok(pid) = pid_str.trim().parse::<u32>() {
-            if is_process_running(pid) {
-                println!("Killing our backend process with PID: {}", pid);
-                
-                #[cfg(unix)]
+        {
+            Ok(status) => {
+                if status.success() {
+                    println!("Successfully killed lizard-backend processes");
+                } else {
+                    println!("No lizard-backend processes found to kill");
+                }
+            }
+            Err(e) => {
+                eprintln!("Failed to run pkill: {}", e);
+                // Fallback to pgrep + kill
+                if let Ok(output) = std::process::Command::new("pgrep")
+                    .args(["-f", "lizard-backend"])
+                    .output()
                 {
-                    // Try graceful termination first
-                    if std::process::Command::new("kill")
-                        .args(["-TERM", &pid.to_string()])
-                        .status()
-                        .map(|s| s.success())
-                        .unwrap_or(false)
-                    {
-                        // Wait a bit for graceful shutdown
-                        std::thread::sleep(std::time::Duration::from_millis(500));
-                        
-                        // Force kill if still running
-                        if is_process_running(pid) {
+                    let pids = String::from_utf8_lossy(&output.stdout);
+                    for pid in pids.lines() {
+                        if let Ok(pid_num) = pid.trim().parse::<u32>() {
+                            println!("Force killing PID: {}", pid_num);
                             let _ = std::process::Command::new("kill")
-                                .args(["-9", &pid.to_string()])
+                                .args(["-9", &pid_num.to_string()])
                                 .status();
                         }
                     }
                 }
-                
-                #[cfg(windows)]
-                {
-                    let _ = std::process::Command::new("taskkill")
-                        .args(["/F", "/PID", &pid.to_string()])
-                        .status();
+            }
+        }
+        
+        // Also try killall as additional cleanup
+        let _ = std::process::Command::new("killall")
+            .args(["lizard-backend"])
+            .status();
+    }
+    
+    #[cfg(windows)]
+    {
+        // Use taskkill to kill all processes with name lizard-backend
+        match std::process::Command::new("taskkill")
+            .args(["/F", "/IM", "lizard-backend.exe"])
+            .status()
+        {
+            Ok(status) => {
+                if status.success() {
+                    println!("Successfully killed lizard-backend.exe processes");
+                } else {
+                    println!("No lizard-backend.exe processes found to kill");
+                }
+            }
+            Err(e) => {
+                eprintln!("Failed to run taskkill: {}", e);
+            }
+        }
+        
+        // Also try without .exe extension
+        let _ = std::process::Command::new("taskkill")
+            .args(["/F", "/IM", "lizard-backend"])
+            .status();
+            
+        // Use wmic as fallback to find processes by command line
+        if let Ok(output) = std::process::Command::new("wmic")
+            .args(["process", "where", "CommandLine like '%lizard-backend%'", "get", "ProcessId", "/format:value"])
+            .output()
+        {
+            let output_str = String::from_utf8_lossy(&output.stdout);
+            for line in output_str.lines() {
+                if line.starts_with("ProcessId=") {
+                    if let Ok(pid) = line.replace("ProcessId=", "").trim().parse::<u32>() {
+                        println!("Force killing PID: {}", pid);
+                        let _ = std::process::Command::new("taskkill")
+                            .args(["/F", "/PID", &pid.to_string()])
+                            .status();
+                    }
                 }
             }
         }
     }
-    
-    // Clean up PID file
-    let _ = fs::remove_file(&pid_file);
-    
-    // Additional safety: check if our port is still occupied
-    if !is_port_available(BACKEND_PORT) {
-        println!("Warning: Port {} is still occupied after cleanup", BACKEND_PORT);
-    }
-}
-
-fn write_pid_file(app: &tauri::App, pid: u32) {
-    let pid_file = get_pid_file_path(app);
-    if let Some(parent) = pid_file.parent() {
-        let _ = fs::create_dir_all(parent);
-    }
-    
-    if let Ok(mut file) = fs::File::create(&pid_file) {
-        let _ = write!(file, "{}", pid);
-        println!("Written PID {} to file: {:?}", pid, pid_file);
-    }
-}
-
-fn is_backend_already_running(app: &tauri::App) -> bool {
-    // Check if port is in use
-    if !is_port_available(BACKEND_PORT) {
-        println!("Backend port {} is already in use", BACKEND_PORT);
-        return true;
-    }
-    
-    // Check our PID file
-    let pid_file = get_pid_file_path(app);
-    if let Ok(pid_str) = fs::read_to_string(&pid_file) {
-        if let Ok(pid) = pid_str.trim().parse::<u32>() {
-            if is_process_running(pid) {
-                println!("Our backend already running with PID: {}", pid);
-                return true;
-            } else {
-                // Clean up stale PID file
-                let _ = fs::remove_file(&pid_file);
-            }
-        }
-    }
-    
-    false
 }
 
 #[tauri::command]
@@ -143,7 +98,7 @@ fn greet(name: &str) -> String {
 }
 
 #[tauri::command]
-fn stop_python_server(state: State<PythonProcess>, app: tauri::AppHandle) {
+fn stop_python_server(state: State<PythonProcess>) {
     let mut process = state.0.lock().unwrap();
     if let Some(ref mut child) = *process {
         println!("Attempting to stop Python backend...");
@@ -180,8 +135,8 @@ fn stop_python_server(state: State<PythonProcess>, app: tauri::AppHandle) {
         *process = None;
     }
     
-    // Clean up only our processes safely
-    cleanup_our_backend_processes(None, Some(&app));
+    // Kill any remaining lizard-backend processes
+    kill_all_lizard_backends();
 }
 
 fn find_backend_path(app: &tauri::App) -> Option<std::path::PathBuf> {
@@ -218,14 +173,8 @@ pub fn run() {
         .setup(|app| {
             println!("Setting up Tauri app...");
             
-            // Check if our backend is already running (safer than killing everything)
-            if is_backend_already_running(app) {
-                println!("Backend already running, skipping startup");
-                return Ok(());
-            }
-            
             // Kill any existing lizard-backend processes before starting
-            //kill_all_lizard_backends();
+            kill_all_lizard_backends();
             
             let resource_dir = app.path().resource_dir().unwrap();
             println!("Resource directory: {:?}", resource_dir);
@@ -268,10 +217,6 @@ pub fn run() {
                         Ok(python_process) => {
                             let pid = python_process.id();
                             println!("Python backend started successfully with PID: {}", pid);
-                            
-                            // Write PID file for safe tracking
-                            write_pid_file(app, pid);
-                            
                             let state: State<PythonProcess> = app.state();
                             *state.0.lock().unwrap() = Some(python_process);
                         }
@@ -294,10 +239,10 @@ pub fn run() {
         })
         .on_window_event(|window, event| {
             if let tauri::WindowEvent::CloseRequested { .. } = event {
-                println!("Window close requested, cleaning up our backend processes...");
+                println!("Window close requested, killing all lizard-backend processes...");
                 
-                // Clean up only our processes safely
-                cleanup_our_backend_processes(None, Some(&window.app_handle()));
+                // Kill all lizard-backend processes regardless of debug mode
+                kill_all_lizard_backends();
                 
                 #[cfg(not(debug_assertions))]
                 {
