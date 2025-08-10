@@ -43,7 +43,7 @@ PRs welcome, especially if you add more lizard.
 MIT – Maximum Iguana Tolerance.
 
 <p align="center">
-<img width="480" height="360" alt="image" src="https://github.com/user-attachments/assets/242d47c5-9586-4c7f-8da9-b933aae8976a" />
+<img width="480" height="360" alt="image" src="https://github.com/user-attachments/assets/242d47c5-9586-4c7f-8da9-b933aae8976a](https://c.tenor.com/kh1Jla77OeIAAAAC/tenor.gif" />
 </p>
 
 ---
