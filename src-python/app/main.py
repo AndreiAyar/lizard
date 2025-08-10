@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+import setproctitle
 import sys
 import logging
 import os
@@ -6,34 +7,70 @@ import time
 import json
 import uvicorn
 from fastapi.middleware.cors import CORSMiddleware
-import signal
 
-# Set up minimal logging initially
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+
+# Set up logging
+logging.basicConfig(
+    level=logging.DEBUG,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    handlers=[
+        logging.FileHandler("/tmp/lizard-backend.log"),
+        logging.StreamHandler(sys.stdout),
+    ],
+)
+
 logger = logging.getLogger(__name__)
 
-main_dir = os.path.dirname(os.path.abspath(__file__))
-sound_path = os.path.join(main_dir, "sounds", "lizard_cleaned.wav")
-settings_file = os.path.join(main_dir, "data", "settings.json")
-app_status = "on"
+# Determine if running as PyInstaller bundle
+IS_BUNDLED = getattr(sys, 'frozen', False)
 
-# Lazy-loaded globals
-sound_to_play_on_k_press = None
-listener = None
-last_played = 0
+if IS_BUNDLED:
+    # In production: use user's home directory for writable files
+    import platform
+    system = platform.system()
+    
+    if system == "Darwin":  # macOS
+        config_dir = os.path.expanduser("~/Library/Application Support/Lizard")
+    elif system == "Windows":
+        config_dir = os.path.expanduser("~/AppData/Roaming/Lizard")
+    else:  # Linux
+        config_dir = os.path.expanduser("~/.config/lizard")
+    
+    # Create config directory if it doesn't exist
+    os.makedirs(config_dir, exist_ok=True)
+    settings_file = os.path.join(config_dir, "settings.json")
+    
+    # For bundled resources (sounds), use the PyInstaller temp directory
+    main_dir = sys._MEIPASS
+    sound_path = os.path.join(main_dir, "sounds", "lizard_cleaned.wav")
+    
+    logger.info(f"Production mode: Settings will be saved to {settings_file}")
+    logger.info(f"Production mode: Sounds loaded from {sound_path}")
+else:
+    # In development: use source directory
+    main_dir = os.path.dirname(os.path.abspath(__file__))
+    sound_path = os.path.join(main_dir, "sounds", "lizard_cleaned.wav")
+    settings_file = os.path.join(main_dir, "data", "settings.json")
+    
+    logger.info(f"Development mode: Settings file at {settings_file}")
+
+app_status = "on"
 backend_ready = False
+last_played = 0
 
 from contextlib import asynccontextmanager
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup
     logger.info("=== LIZARD BACKEND STARTING ===")
-    
+
     # Start background initialization
     import asyncio
+
     asyncio.create_task(initialize_backend())
-    
+
     yield
     # Shutdown
     global listener
@@ -41,36 +78,44 @@ async def lifespan(app: FastAPI):
         listener.stop()
     logger.info("=== LIZARD BACKEND SHUTTING DOWN ===")
 
+
 async def initialize_backend():
     """Initialize heavy components asynchronously"""
     global sound_to_play_on_k_press, listener, backend_ready
-    
+
     try:
         # Load audio file
         import simpleaudio as sa
+
         sound_to_play_on_k_press = sa.WaveObject.from_wave_file(sound_path)
-        
+
         # Start keyboard listener
         from pynput import keyboard
+
         listener = keyboard.Listener(on_press=on_press)
         listener.start()
-        
+
         backend_ready = True
         logger.info("Backend initialization complete")
-        
+
     except Exception as e:
         logger.error(f"Backend initialization failed: {e}")
 
+
 app = FastAPI(lifespan=lifespan)
 
+
 def on_press(key):
-    if app_status == "off" or not backend_ready:
+    # print("key pressed {0}".format(key))
+    if app_status == "off":
         return
     global last_played
     now = time.time()
     if now - last_played > DEBOUNCE_DELAY:
         if sound_to_play_on_k_press:
+            # return
             sound_to_play_on_k_press.play()
+            # play_obj.wait_done() blocking not needed as for now..
         last_played = now
 
 
@@ -149,30 +194,17 @@ def get_settings():
 def post_settings(new_settings: dict):
     return update_settings(new_settings)
 
-def signal_handler(signum, frame):
-    """Handle termination signals"""
-    logger.info(f"Received signal {signum}, shutting down...")
-    global listener
-    if listener:
-        listener.stop()
-    sys.exit(0)
 
-# Register signal handlers
-signal.signal(signal.SIGTERM, signal_handler)
-signal.signal(signal.SIGINT, signal_handler)
-
+setproctitle.setproctitle("lizard-backend-server")
 # START THE SERVER
 if __name__ == "__main__":
     logger.info("=== STARTING UVICORN SERVER ===")
     try:
-        uvicorn.run(
-            app,
-            host="0.0.0.0",
-            port=8000,
-            log_level="warning"
+        config = uvicorn.Config(
+            app, host="0.0.0.0", port=8000, log_level="info", reload=False, workers=1
         )
-    except KeyboardInterrupt:
-        logger.info("Received keyboard interrupt, shutting down...")
+        server = uvicorn.Server(config)
+        server.run()  # Directly runs in the same process
     except Exception as e:
         logger.error(f"Failed to start server: {e}")
         raise
