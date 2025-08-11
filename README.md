@@ -29,6 +29,11 @@ Ever wanted your keystrokes to sound like the latest lizard meme? Now, they do.
   ```sh
   cargo install tauri-cli
   ```
+- Create Python virtual environment:
+  ```sh
+  cd src-python
+  python -m venv venv
+  ```
 - Install dependencies:  
   ```sh
   npm install

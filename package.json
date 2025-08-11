@@ -5,7 +5,7 @@
     "dev": "concurrently --kill-others \"npm run dev:python\" \"npm run dev:tauri\"",
     "dev:python": "npm run dev:python:unix || npm run dev:python:win",
     "dev:python:unix": "cd src-python && source venv/bin/activate && uvicorn app.main:app --reload --port 8000",
-    "dev:python:win": "cd src-python && venv\\Scripts\\activate.bat && uvicorn app.main:app --reload --port 8000",
+    "dev:python:win": "cd src-python && venv\\Scripts\\activate && uvicorn app.main:app --reload --port 8000",
     "dev:tauri": "cd src-tauri && cargo tauri dev",
     "cleanup": "npm run cleanup:unix || npm run cleanup:win || true",
     "cleanup:unix": "pkill -f 'uvicorn app.main:app' || true",
@@ -14,7 +14,7 @@
     "build": "npm run build:python && npm run build:frontend && npm run build:tauri",
     "build:python": "npm run build:python:unix || npm run build:python:win",
     "build:python:unix": "cd src-python && source venv/bin/activate && python build.py",
-    "build:python:win": "cd src-python && venv\\Scripts\\activate.bat && python build.py",
+    "build:python:win": "cd src-python && venv\\Scripts\\activate && python build.py",
     "build:frontend": "cd src-svelte && npm run build",
     "build:tauri": "cd src-tauri && cargo tauri build"
   },
