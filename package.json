@@ -13,6 +13,7 @@
     "build:tauri": "cd src-tauri && cargo tauri build"
   },
   "devDependencies": {
-    "concurrently": "^8.2.2"
+    "concurrently": "^8.2.2",
+    "@tauri-apps/cli": "^2.0.0"
   }
 }
