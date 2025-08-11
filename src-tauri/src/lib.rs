@@ -208,19 +208,12 @@ pub fn run() {
                         }
                     }
                     
-                    let mut cmd = Command::new(&backend_path);
-                    cmd.stdin(Stdio::null())
+                    match Command::new(&backend_path)
+                        .stdin(Stdio::null())
                         .stdout(Stdio::null())
-                        .stderr(Stdio::null());
-                    
-                    // Hide console window on Windows
-                    #[cfg(windows)]
+                        .stderr(Stdio::null())
+                        .spawn()
                     {
-                        use std::os::windows::process::CommandExt;
-                        cmd.creation_flags(0x08000000); // CREATE_NO_WINDOW
-                    }
-                    
-                    match cmd.spawn() {
                         Ok(python_process) => {
                             let pid = python_process.id();
                             println!("Python backend started successfully with PID: {}", pid);
