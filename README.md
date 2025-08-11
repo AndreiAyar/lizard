@@ -34,6 +34,17 @@ Ever wanted your keystrokes to sound like the latest lizard meme? Now, they do.
   cd src-python
   python -m venv venv
   ```
+- Install Python requirements:
+  ```sh
+  # Activate virtual environment first
+  # On macOS/Linux:
+  source venv/bin/activate
+  # On Windows:
+  venv\Scripts\activate
+  
+  # Then install requirements
+  pip install -r requirements.txt
+  ```
 - Install dependencies:  
   ```sh
   npm install
