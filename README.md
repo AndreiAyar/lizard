@@ -23,7 +23,7 @@ Ever wanted your keystrokes to sound like the latest lizard meme? Now, they do.
   ```
 - **Windows users only**: Install Windows build tools:
   ```sh
-  npm install --global windows-build-tools
+  # Visit https://visualstudio.microsoft.com/visual-cpp-build-tools/
   ```
 - Install the **Tauri CLI**:
   ```sh
