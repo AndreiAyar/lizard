@@ -3,17 +3,24 @@
   "private": true,
   "scripts": {
     "dev": "concurrently --kill-others \"npm run dev:python\" \"npm run dev:tauri\"",
-    "dev:python": "cd src-python && source venv/bin/activate && uvicorn app.main:app --reload --port 8000",
+    "dev:python": "npm run dev:python:unix || npm run dev:python:win",
+    "dev:python:unix": "cd src-python && source venv/bin/activate && uvicorn app.main:app --reload --port 8000",
+    "dev:python:win": "cd src-python && venv\\Scripts\\activate && uvicorn app.main:app --reload --port 8000",
     "dev:tauri": "cd src-tauri && cargo tauri dev",
-    "cleanup": "pkill -f 'uvicorn app.main:app' || true",
+    "cleanup": "npm run cleanup:unix || npm run cleanup:win || true",
+    "cleanup:unix": "pkill -f 'uvicorn app.main:app' || true",
+    "cleanup:win": "taskkill /f /im python.exe /fi \"WINDOWTITLE eq uvicorn*\" || true",
     "stop": "npm run cleanup",
     "build": "npm run build:python && npm run build:frontend && npm run build:tauri",
-    "build:python": "cd src-python && source venv/bin/activate && python build.py",
+    "build:python": "npm run build:python:unix || npm run build:python:win",
+    "build:python:unix": "cd src-python && source venv/bin/activate && python build.py",
+    "build:python:win": "cd src-python && venv\\Scripts\\activate && python build.py",
     "build:frontend": "cd src-svelte && npm run build",
     "build:tauri": "cd src-tauri && cargo tauri build"
   },
   "devDependencies": {
     "concurrently": "^8.2.2",
-    "@tauri-apps/cli": "^2.0.0"
+    "@tauri-apps/cli": "^2.0.0",
+    "cross-env": "^7.0.3"
   }
 }
