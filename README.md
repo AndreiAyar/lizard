@@ -16,6 +16,11 @@ Ever wanted your keystrokes to sound like the latest lizard meme? Now, they do.
 
 - Written in **Python** and **Svelte**.
 - Runs as a desktop app thanks to **Tauri** (so fast, so light, so lizard).
+- First, install **Rust** and **Cargo** (required for Tauri):
+  ```sh
+  # Visit https://www.rust-lang.org/tools/install for detailed instructions
+  curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+  ```
 - Install dependencies:  
   ```sh
   npm install
@@ -48,4 +53,4 @@ MIT – Maximum Iguana Tolerance.
 
 ---
 
-> "Lizard. Lizard. Lizard." – someone, probably  
+> "Lizard. Lizard. Lizard." – someone, probably
