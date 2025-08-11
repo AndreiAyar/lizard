@@ -49,7 +49,7 @@ PyInstaller.__main__.run([
     '--hidden-import=fastapi',
     '--hidden-import=simpleaudio',
     '--hidden-import=pynput',
-    '--windowed'
+    '--console'
 ])
 
 print(f"Built binary: {exe_name}")
