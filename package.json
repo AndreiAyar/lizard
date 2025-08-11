@@ -16,7 +16,7 @@
     "build:windows": "npm run build:python:win && npm run build:frontend && npm run build:tauri",
     "build:python": "npm run build:python:unix || npm run build:python:win",
     "build:python:unix": "cd src-python && source venv/bin/activate && python build.py",
-    "build:python:win": "cd src-python && call venv\\Scripts\\activate.bat && python build.py",
+    "build:python:win": "cd src-python && venv\\Scripts\\activate && python build.py",
     "build:frontend": "cd src-svelte && npm run build",
     "build:tauri": "cd src-tauri && cargo tauri build"
   },
