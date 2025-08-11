@@ -1,6 +1,6 @@
 # 🦎 Lizard Keyboard Sounds
 
-Welcome to **Lizard** – the only keyboard sound app that outputs pure, unfiltered lizard energy.  
+Welcome to **Lizard** - the only keyboard sound app that outputs pure, unfiltered lizard energy.  
 Ever wanted your keystrokes to sound like the latest lizard meme? Now, they do.
 <p align="center">
 <img width="629" height="738" alt="Screenshot 2025-08-10 at 22 09 47" src="https://github.com/user-attachments/assets/1e0249e5-901e-487f-b44b-f6aef2397863" />
@@ -69,7 +69,7 @@ PRs welcome, especially if you add more lizard.
 
 ## License
 
-MIT – Maximum Iguana Tolerance.
+MIT - Maximum Iguana Tolerance.
 
 <p align="center">
 <img width="480" height="360" alt="image" src="https://c.tenor.com/kh1Jla77OeIAAAAC/tenor.gif" />
@@ -77,4 +77,4 @@ MIT – Maximum Iguana Tolerance.
 
 ---
 
-> "Lizard. Lizard. Lizard." – someone, probably
+> "Lizard. Lizard. Lizard." - A lizard.
