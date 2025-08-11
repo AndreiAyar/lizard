@@ -29,6 +29,11 @@ Ever wanted your keystrokes to sound like the latest lizard meme? Now, they do.
   ```sh
   cargo install tauri-cli
   ```
+- Make sure you have **Python 3.11.9** installed:
+  ```sh
+  python --version  # Should show Python 3.11.9
+  # If not, download from https://www.python.org/downloads/release/python-3119/
+  ```
 - Create Python virtual environment:
   ```sh
   cd src-python
