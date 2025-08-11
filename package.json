@@ -12,6 +12,8 @@
     "cleanup:win": "taskkill /f /im python.exe /fi \"WINDOWTITLE eq uvicorn*\" || true",
     "stop": "npm run cleanup",
     "build": "npm run build:python && npm run build:frontend && npm run build:tauri",
+    "build:unix": "npm run build:python:unix && npm run build:frontend && npm run build:tauri",
+    "build:windows": "npm run build:python:win && npm run build:frontend && npm run build:tauri",
     "build:python": "npm run build:python:unix || npm run build:python:win",
     "build:python:unix": "cd src-python && source venv/bin/activate && python build.py",
     "build:python:win": "cd src-python && venv\\Scripts\\activate && python build.py",
