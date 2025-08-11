@@ -60,8 +60,17 @@ Ever wanted your keystrokes to sound like the latest lizard meme? Now, they do.
   ```
 - Build for production (for serious lizard business):  
   ```sh
+  # Cross-platform (tries to detect your OS)
   npm run build
+  
+  # Or use platform-specific commands:
+  # For macOS/Linux:
+  npm run build:unix
+  # For Windows:
+  npm run build:windows
   ```
+
+**Note**: Make sure you've installed Python requirements in the virtual environment before building!
 
 ## Why?
 
