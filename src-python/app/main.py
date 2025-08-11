@@ -7,14 +7,23 @@ import time
 import json
 import uvicorn
 from fastapi.middleware.cors import CORSMiddleware
+import tempfile
+import platform
 
+
+# Set up cross-platform log file path
+system = platform.system()
+if system == "Windows":
+    log_file = os.path.join(tempfile.gettempdir(), "lizard-backend.log")
+else:
+    log_file = "/tmp/lizard-backend.log"
 
 # Set up logging
 logging.basicConfig(
     level=logging.DEBUG,
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     handlers=[
-        logging.FileHandler("/tmp/lizard-backend.log"),
+        logging.FileHandler(log_file),
         logging.StreamHandler(sys.stdout),
     ],
 )
@@ -26,7 +35,6 @@ IS_BUNDLED = getattr(sys, 'frozen', False)
 
 if IS_BUNDLED:
     # In production: use user's home directory for writable files
-    import platform
     system = platform.system()
     
     if system == "Darwin":  # macOS
