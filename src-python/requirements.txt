@@ -13,11 +13,6 @@ pydantic_core==2.33.2
 pyinstaller==6.15.0
 pyinstaller-hooks-contrib==2025.8
 pynput==1.8.1
-pyobjc-core==11.1
-pyobjc-framework-ApplicationServices==11.1
-pyobjc-framework-Cocoa==11.1
-pyobjc-framework-CoreText==11.1
-pyobjc-framework-Quartz==11.1
 python-dotenv==1.1.1
 PyYAML==6.0.2
 simpleaudio==1.0.4
@@ -27,7 +22,6 @@ starlette==0.47.2
 typing-inspection==0.4.1
 typing_extensions==4.14.1
 uvicorn==0.35.0
-uvloop==0.21.0
 watchfiles==1.1.0
 pyinstaller==6.15.0
 websockets==15.0.1
